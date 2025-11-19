@@ -58,8 +58,19 @@ let currentPage = 1;
 let perPage = 30;
 let totalPages = 1;
 
-// Estructura para mantener selección y cantidad
-let seleccionadosMem = {}; // {modelo: {marca, modelo, img, cantidad}}
+// --- SELECCIÓN PERSISTENTE ---
+function cargarSeleccionadosMem() {
+  try {
+    return JSON.parse(localStorage.getItem('seleccionadosMem') || '{}');
+  } catch {
+    return {};
+  }
+}
+function guardarSeleccionadosMem() {
+  localStorage.setItem('seleccionadosMem', JSON.stringify(seleccionadosMem));
+}
+let seleccionadosMem = cargarSeleccionadosMem();
+// --------------------------------
 
 function crearElementoProducto(prod, index) {
     const div = document.createElement('div');
@@ -86,6 +97,7 @@ function crearElementoProducto(prod, index) {
     cantidadInput.onchange = function() {
         if (seleccionadosMem[prod.modelo]) {
             seleccionadosMem[prod.modelo].cantidad = cantidadInput.value;
+            guardarSeleccionadosMem();
         }
     };
 
@@ -110,6 +122,7 @@ function crearElementoProducto(prod, index) {
         } else {
             delete seleccionadosMem[prod.modelo];
         }
+        guardarSeleccionadosMem();
     };
 
     seleccionarLabel.appendChild(checkbox);
@@ -187,6 +200,7 @@ fetch(HOJA_URL)
 </script>
 </body>
 </html>
+
 
 
 
