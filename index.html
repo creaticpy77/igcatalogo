@@ -58,7 +58,9 @@ let currentPage = 1;
 let perPage = 30;
 let totalPages = 1;
 
-// Crear elemento de producto
+// Estructura para mantener selección y cantidad
+let seleccionadosMem = {}; // {modelo: {marca, modelo, img, cantidad}}
+
 function crearElementoProducto(prod, index) {
     const div = document.createElement('div');
     div.className = 'producto';
@@ -77,9 +79,16 @@ function crearElementoProducto(prod, index) {
     const cantidadInput = document.createElement('input');
     cantidadInput.type = 'number';
     cantidadInput.min = 1;
-    cantidadInput.value = 1;
+    cantidadInput.value = seleccionadosMem[prod.modelo]?.cantidad || 1;
     cantidadInput.className = 'cantidad';
     cantidadInput.setAttribute('data-index', index);
+
+    cantidadInput.onchange = function() {
+        if (seleccionadosMem[prod.modelo]) {
+            seleccionadosMem[prod.modelo].cantidad = cantidadInput.value;
+        }
+    };
+
     cantidadLabel.appendChild(cantidadInput);
 
     const seleccionarLabel = document.createElement('label');
@@ -88,6 +97,21 @@ function crearElementoProducto(prod, index) {
     checkbox.type = 'checkbox';
     checkbox.className = 'seleccionar';
     checkbox.setAttribute('data-index', index);
+    checkbox.checked = !!seleccionadosMem[prod.modelo];
+
+    checkbox.onchange = function() {
+        if (checkbox.checked) {
+            seleccionadosMem[prod.modelo] = {
+                marca: prod.marca,
+                modelo: prod.modelo,
+                img: prod.imagesrc,
+                cantidad: cantidadInput.value
+            };
+        } else {
+            delete seleccionadosMem[prod.modelo];
+        }
+    };
+
     seleccionarLabel.appendChild(checkbox);
     seleccionarLabel.appendChild(document.createTextNode(' Seleccionar'));
 
@@ -142,19 +166,7 @@ function changePerPage() {
 }
 
 function abrirSeleccionados() {
-    const seleccionados = [];
-    // Solo los productos en la página actual (ajusta si prefieres que sean de todos los filtrados)
-    document.querySelectorAll('.producto').forEach((div, idx) => {
-        const checkbox = div.querySelector('.seleccionar');
-        const globalIdx = (currentPage - 1) * perPage + idx;
-        if (checkbox.checked) {
-            const marca = filtrados[globalIdx].marca;
-            const modelo = filtrados[globalIdx].modelo;
-            const img = filtrados[globalIdx].imagesrc;
-            const cantidad = div.querySelector('.cantidad').value || 1;
-            seleccionados.push({ marca, modelo, img, cantidad });
-        }
-    });
+    const seleccionados = Object.values(seleccionadosMem);
     localStorage.setItem('productosSeleccionados', JSON.stringify(seleccionados));
     window.open('seleccionados.html', '_blank');
 }
@@ -175,6 +187,7 @@ fetch(HOJA_URL)
 </script>
 </body>
 </html>
+
 
 
 
