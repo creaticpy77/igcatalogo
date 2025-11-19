@@ -1,43 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Productos Seleccionados</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  h1 { margin-bottom: 20px; }
-  .producto { border: 1px solid #ccc; margin: 10px 0; padding: 10px; display:flex; align-items:center; }
-  .producto img { max-width: 150px; margin-right: 15px; }
-  .info { flex-grow: 1; }
-</style>
+  <meta charset="UTF-8" />
+  <title>Productos Seleccionados</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
+    h1 { margin-bottom: 20px; color: #b05eae; }
+    .producto { border: 1px solid #ddd; margin: 12px 0; padding: 15px; display:flex; align-items:center; background: #fff; border-radius: 8px;}
+    .producto img { max-width: 120px; margin-right: 20px; border-radius: 5px; border:1px solid #eee;}
+    .info { flex-grow: 1; }
+    .info strong { color: #6d28c2; }
+    @media (max-width:600px) {
+      .producto {flex-direction:column; align-items:flex-start;}
+      .producto img {margin-bottom: 10px;}
+    }
+    .volver { display:inline-block; margin-bottom:18px; background: #b05eae; color: #fff; text-decoration:none; padding: 9px 16px; border-radius: 5px;}
+  </style>
 </head>
 <body>
-<h1>Productos Seleccionados</h1>
-<div id="seleccionados"></div>
-<script>
-  const seleccionados = JSON.parse(localStorage.getItem('productosSeleccionados') || '[]');
-  const contenedor = document.getElementById('seleccionados');
+  <a href="index.html" class="volver">← Volver al catálogo</a>
+  <h1>Productos Seleccionados</h1>
+  <div id="seleccionados"></div>
+  <script>
+    // Leer productos seleccionados del localStorage
+    const seleccionados = JSON.parse(localStorage.getItem('productosSeleccionados') || '[]');
+    const contenedor = document.getElementById('seleccionados');
 
-  seleccionados.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'producto';
+    if (seleccionados.length === 0) {
+      contenedor.innerHTML = '<p>No hay productos seleccionados.</p>';
+    } else {
+      seleccionados.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'producto';
 
-    const img = document.createElement('img');
-    img.src = p.img;
-    img.alt = p.modelo;
+        const img = document.createElement('img');
+        img.src = p.img;
+        img.alt = p.modelo;
 
-    const info = document.createElement('div');
-    info.className = 'info';
-    info.innerHTML = `<strong>Marca:</strong> ${p.marca}<br><strong>Modelo:</strong> ${p.modelo}<br><strong>Cantidad:</strong> ${p.cantidad}`;
+        const info = document.createElement('div');
+        info.className = 'info';
+        info.innerHTML = `<strong>Marca:</strong> ${p.marca}<br>
+                          <strong>Modelo:</strong> ${p.modelo}<br>
+                          <strong>Cantidad:</strong> ${p.cantidad}`;
 
-    div.appendChild(img);
-    div.appendChild(info);
-    contenedor.appendChild(div);
-  });
-
-  if(seleccionados.length === 0) {
-    contenedor.innerHTML = '<p>No hay productos seleccionados.</p>';
-  }
-</script>
+        div.appendChild(img);
+        div.appendChild(info);
+        contenedor.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
+
