@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Productos Seleccionados</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
     h1 { margin-bottom: 20px; color: #b05eae; }
@@ -16,12 +17,23 @@
     }
     .volver { display:inline-block; margin-bottom:18px; background: #b05eae; color: #fff; text-decoration:none; padding: 9px 16px; border-radius: 5px;}
     .vacio { color: #6d28c2; margin-top: 25px; font-size: 18px;}
+    .botones { display:flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
+    .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block;}
+    .btn-pdf { background: #e74c3c; color: #fff; }
+    .btn-pdf:hover { background: #c0392b; }
+    .btn-whatsapp { background: #25d366; color: #fff; }
+    .btn-whatsapp:hover { background: #128c7e; }
   </style>
 </head>
 <body>
   <a href="https://creaticpy77.github.io/igcatalogo/" class="volver">← Volver al catálogo</a>
   <h1>Productos Seleccionados</h1>
+  <div class="botones">
+    <button class="btn btn-pdf" onclick="descargarPDF()">📥 Descargar PDF</button>
+    <a href="#" class="btn btn-whatsapp" id="btnWhatsApp" target="_blank">💬 Enviar por WhatsApp</a>
+  </div>
   <div id="seleccionados"></div>
+
   <script>
     // Leer productos seleccionados del localStorage (persistente)
     let seleccionados = [];
@@ -35,6 +47,7 @@
 
     if (seleccionados.length === 0) {
       contenedor.innerHTML = '<p class="vacio">No hay productos seleccionados.</p>';
+      document.querySelector('.botones').style.display = 'none';
     } else {
       seleccionados.forEach(p => {
         const div = document.createElement('div');
@@ -54,10 +67,43 @@
         div.appendChild(info);
         contenedor.appendChild(div);
       });
+
+      // Generar enlace de WhatsApp
+      generarWhatsAppLink();
+    }
+
+    function descargarPDF() {
+      const elemento = document.getElementById('seleccionados');
+      const opciones = {
+        margin: 10,
+        filename: 'productos_seleccionados.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      html2pdf().set(opciones).from(elemento).save();
+    }
+
+    function generarWhatsAppLink() {
+      let mensaje = 'Hola! Te envío los productos que he seleccionado del catálogo IG IMPORT:\n\n';
+      
+      seleccionados.forEach((p, idx) => {
+        mensaje += `${idx + 1}. ${p.marca} - ${p.modelo}\n   Cantidad: ${p.cantidad}\n\n`;
+      });
+
+      mensaje += `\nPuedes ver el catálogo completo aquí: https://creaticpy77.github.io/igcatalogo/`;
+
+      // Codificar el mensaje para URL
+      const mensajeCodificado = encodeURIComponent(mensaje);
+      const numeroWhatsApp = '595987334125'; // Tu número sin el +
+      const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
+
+      document.getElementById('btnWhatsApp').href = linkWhatsApp;
     }
   </script>
 </body>
 </html>
+
 
 
 
