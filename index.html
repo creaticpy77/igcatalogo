@@ -15,6 +15,11 @@
     input[type="number"] { width: 60px; font-size: 16px; }
     .producto-select { margin-left: 18px; font-size: 15px;}
     label { margin-bottom: 4px; }
+    .pagination { margin-top: 20px; display:flex; align-items: center; gap: 8px;}
+    .pagination button { padding: 6px 12px; background: #b05eae; color:#fff; border:none; border-radius:4px; cursor:pointer;}
+    .pagination button[disabled] { background: #e0d9e6; color: #999; cursor:default;}
+    .pagination select { margin-left: 15px; padding: 4px 8px; }
+    .pagina-info {margin-left: 12px; font-weight: bold;}
     @media (max-width:600px) {
       .producto {flex-direction:column; align-items:flex-start;}
       .producto img {margin-bottom: 10px;}
@@ -27,12 +32,33 @@
   <br>
   <button id="abrirSeleccionados" onclick="abrirSeleccionados()">Abrir Página con productos seleccionados</button>
   <div id="productos"></div>
+  <div class="pagination">
+    <button id="first" onclick="goToPage(1)">Inicio</button>
+    <button id="prev" onclick="goToPage(currentPage - 1)">Anterior</button>
+    <span class="pagina-info" id="pagina-info"></span>
+    <button id="next" onclick="goToPage(currentPage + 1)">Siguiente</button>
+    <button id="last" onclick="goToPage(totalPages)">Final</button>
+    <label for="perPage">Ver</label>
+    <select id="perPage" onchange="changePerPage()">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="30" selected>30</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+    <span>por página</span>
+  </div>
 
 <script>
 const HOJA_URL = "https://opensheet.elk.sh/1ik07i73RGHhsSCw71oz7-cwqt6g1gMfdjZ9sZDXhgP4/Hoja1";
 
 let productos = [];
+let filtrados = [];
+let currentPage = 1;
+let perPage = 30;
+let totalPages = 1;
 
+// Crear elemento de producto
 function crearElementoProducto(prod, index) {
     const div = document.createElement('div');
     div.className = 'producto';
@@ -73,30 +99,58 @@ function crearElementoProducto(prod, index) {
     return div;
 }
 
-function mostrarProductos(arr) {
+function mostrarProductosPagina() {
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
-    arr.forEach((prod, idx) => {
-        contenedor.appendChild(crearElementoProducto(prod, idx));
-    });
+    let inicio = (currentPage - 1) * perPage;
+    let fin = Math.min(inicio + perPage, filtrados.length);
+    for (let i = inicio; i < fin; i++) {
+        contenedor.appendChild(crearElementoProducto(filtrados[i], i));
+    }
+    actualizarEstadoPaginacion();
+}
+
+function actualizarEstadoPaginacion() {
+    totalPages = Math.max(1, Math.ceil(filtrados.length / perPage));
+    document.getElementById('first').disabled = currentPage === 1;
+    document.getElementById('prev').disabled = currentPage === 1;
+    document.getElementById('next').disabled = currentPage === totalPages;
+    document.getElementById('last').disabled = currentPage === totalPages;
+    document.getElementById('pagina-info').textContent =
+      `Página ${currentPage} de ${totalPages} (${filtrados.length} productos)`;
 }
 
 function filtrarProductos() {
     const filtro = document.getElementById('buscar').value.toLowerCase();
-    document.querySelectorAll('.producto').forEach(div => {
-        const modelo = div.dataset.modelo;
-        div.style.display = modelo.includes(filtro) ? 'flex' : 'none';
-    });
+    filtrados = productos.filter(item => (item.modelo || '').toLowerCase().includes(filtro));
+    currentPage = 1;
+    mostrarProductosPagina();
+}
+
+function goToPage(page) {
+    totalPages = Math.max(1, Math.ceil(filtrados.length / perPage));
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    currentPage = page;
+    mostrarProductosPagina();
+}
+
+function changePerPage() {
+    perPage = parseInt(document.getElementById('perPage').value);
+    currentPage = 1;
+    mostrarProductosPagina();
 }
 
 function abrirSeleccionados() {
     const seleccionados = [];
+    // Solo los productos en la página actual (ajusta si prefieres que sean de todos los filtrados)
     document.querySelectorAll('.producto').forEach((div, idx) => {
         const checkbox = div.querySelector('.seleccionar');
+        const globalIdx = (currentPage - 1) * perPage + idx;
         if (checkbox.checked) {
-            const marca = productos[idx].marca;
-            const modelo = productos[idx].modelo;
-            const img = productos[idx].imagesrc;
+            const marca = filtrados[globalIdx].marca;
+            const modelo = filtrados[globalIdx].modelo;
+            const img = filtrados[globalIdx].imagesrc;
             const cantidad = div.querySelector('.cantidad').value || 1;
             seleccionados.push({ marca, modelo, img, cantidad });
         }
@@ -105,13 +159,13 @@ function abrirSeleccionados() {
     window.open('seleccionados.html', '_blank');
 }
 
-// ¡NUEVO! Traemos productos al cargar:
+// Cargar productos al arrancar
 fetch(HOJA_URL)
     .then(response => response.json())
     .then(data => {
-        // Filtra vacíos y filas sin modelo
         productos = data.filter(item => item.modelo && item.imagesrc);
-        mostrarProductos(productos);
+        filtrados = productos; // al inicio son todos
+        mostrarProductosPagina();
     })
     .catch(err => {
         document.getElementById('productos').innerHTML = '<p style="color:red">No se pudo cargar el catálogo.</p>';
@@ -121,5 +175,6 @@ fetch(HOJA_URL)
 </script>
 </body>
 </html>
+
 
 
