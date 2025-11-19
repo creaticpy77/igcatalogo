@@ -1,50 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>IG IMPORT - PRODUCTOS ANA HICKMANN</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  h1 { margin-bottom: 10px; }
-  .producto { border: 1px solid #ccc; margin: 10px 0; padding: 10px; display:flex; align-items:center; }
-  .producto img { max-width: 150px; margin-right: 15px; }
-  .info { flex-grow: 1; }
-  label { display:block; margin-bottom: 5px; }
-  input[type="number"] { width: 50px; }
-  .producto-select { margin-left: 15px; }
-  #buscar { margin-bottom: 15px; padding: 7px; width: 300px; }
-  #abrirSeleccionados { margin-bottom: 20px; padding: 10px 15px; }
-</style>
+  <meta charset="UTF-8" />
+  <title>IG IMPORT - PRODUCTOS ANA HICKMANN</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa;}
+    h1 { margin-bottom: 10px; color: #b05eae; }
+    #buscar {margin-bottom: 15px; padding: 7px; width: 300px; font-size: 16px;}
+    #abrirSeleccionados {margin-bottom: 20px; padding: 10px 15px; background: #b05eae; color: #fff; border:none; border-radius: 4px; cursor:pointer;}
+    .producto { border: 1px solid #ddd; margin: 12px 0; padding: 15px; display:flex; align-items:center; background: #fff; border-radius: 8px;}
+    .producto img { max-width: 120px; margin-right: 20px; border-radius: 5px; border:1px solid #eee;}
+    .info { flex-grow: 1;}
+    .info strong {color: #6d28c2;}
+    input[type="number"] { width: 60px; font-size: 16px; }
+    .producto-select { margin-left: 18px; font-size: 15px;}
+    label { margin-bottom: 4px; }
+    @media (max-width:600px) {
+      .producto {flex-direction:column; align-items:flex-start;}
+      .producto img {margin-bottom: 10px;}
+    }
+  </style>
 </head>
 <body>
-
-<h1>IG IMPORT - PRODUCTOS ANA HICKMANN</h1>
-
-<input 
-  type="text" 
-  id="buscar" 
-  placeholder="Buscar por modelo..." 
-  oninput="filtrarProductos()" 
-/>
-
-<button id="abrirSeleccionados" onclick="abrirSeleccionados()">Abrir Página con productos seleccionados</button>
-
-<div id="productos"></div>
+  <h1>IG IMPORT - PRODUCTOS ANA HICKMANN</h1>
+  <input type="text" id="buscar" placeholder="Buscar por modelo..." oninput="filtrarProductos()" autocomplete="off" />
+  <br>
+  <button id="abrirSeleccionados" onclick="abrirSeleccionados()">Abrir Página con productos seleccionados</button>
+  <div id="productos"></div>
 
 <script>
-  const productos = ${JSON.stringify(
-    require('fs')
-      .readFileSync('ahigfull01.csv', 'utf-8')
-      .split('\n')
-      .slice(1)
-      .filter(line => line.trim())
-      .map(line => {
-        const [marca, modelo, imagesrc] = line.split(',');
-        return { marca, modelo, imagesrc };
-      })
-  )};
+  // Catálogo extraído del CSV, puedes agregar más productos en este array si tienes más filas:
+  const productos = [
+    {marca:"ANA HICKMANN", modelo:"HI6067-T02", imagesrc:"https://image4.cdnsbg.com/2/674/697608_1761818164726.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI1173-06A", imagesrc:"https://image4.cdnsbg.com/2/674/697605_1761712489496.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6348-H01", imagesrc:"https://image4.cdnsbg.com/2/674/697570_1761818164725.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6347-H06", imagesrc:"https://image4.cdnsbg.com/2/674/697568_1761712489495.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI6135-E01", imagesrc:"https://image4.cdnsbg.com/2/674/680271_1761712489494.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI6132E-H01", imagesrc:"https://image4.cdnsbg.com/2/674/680266_1761712489493.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI6126-G21", imagesrc:"https://image4.cdnsbg.com/2/674/680261_1753883466232.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI6248-P02", imagesrc:"https://image4.cdnsbg.com/2/674/715819_1744850377350.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI1185-E03", imagesrc:"https://image4.cdnsbg.com/2/674/715807_1744850377346.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI1184-E03", imagesrc:"https://image4.cdnsbg.com/2/674/715803_1744850377346.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6494-C03", imagesrc:"https://image4.cdnsbg.com/2/674/715799_1744850377345.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6475-G22", imagesrc:"https://image4.cdnsbg.com/2/674/715793_1744850377344.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6472-H02", imagesrc:"https://image4.cdnsbg.com/2/674/715785_1744850377342.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"AH6467-P02", imagesrc:"https://image4.cdnsbg.com/2/674/715780_1744850377341.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HI6234-H01", imagesrc:"https://image4.cdnsbg.com/2/674/707579_1739851230422.jpg?width=450&height=225"},
+    {marca:"ANA HICKMANN", modelo:"HIY6001-P03", imagesrc:"https://image4.cdnsbg.com/2/674/697654_1733194685940.jpg?width=450&height=225"}
+    // Puedes seguir agregando el resto aquí...
+  ];
 
-  function crearElementoProducto(prod) {
+  function crearElementoProducto(prod, index) {
     const div = document.createElement('div');
     div.className = 'producto';
     div.dataset.modelo = prod.modelo.toLowerCase();
@@ -52,10 +58,10 @@
     const img = document.createElement('img');
     img.src = prod.imagesrc;
     img.alt = prod.modelo;
-    
+
     const info = document.createElement('div');
     info.className = 'info';
-    info.innerHTML = `<strong>Marca: </strong>${prod.marca}<br><strong>Modelo: </strong>${prod.modelo}`;
+    info.innerHTML = `<strong>Marca:</strong> ${prod.marca}<br><strong>Modelo:</strong> ${prod.modelo}`;
 
     const cantidadLabel = document.createElement('label');
     cantidadLabel.textContent = 'Cantidad: ';
@@ -64,6 +70,7 @@
     cantidadInput.min = 1;
     cantidadInput.value = 1;
     cantidadInput.className = 'cantidad';
+    cantidadInput.setAttribute('data-index', index);
     cantidadLabel.appendChild(cantidadInput);
 
     const seleccionarLabel = document.createElement('label');
@@ -71,6 +78,7 @@
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'seleccionar';
+    checkbox.setAttribute('data-index', index);
     seleccionarLabel.appendChild(checkbox);
     seleccionarLabel.appendChild(document.createTextNode(' Seleccionar'));
 
@@ -85,8 +93,8 @@
   function cargarProductos() {
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
-    productos.forEach(prod => {
-      contenedor.appendChild(crearElementoProducto(prod));
+    productos.forEach((prod, idx) => {
+      contenedor.appendChild(crearElementoProducto(prod, idx));
     });
   }
 
@@ -100,12 +108,12 @@
 
   function abrirSeleccionados() {
     const seleccionados = [];
-    document.querySelectorAll('.producto').forEach(div => {
+    document.querySelectorAll('.producto').forEach((div, idx) => {
       const checkbox = div.querySelector('.seleccionar');
       if (checkbox.checked) {
-        const marca = div.querySelector('.info').innerHTML.match(/Marca: <\/strong>(.*?)<br>/)[1];
-        const modelo = div.querySelector('.info').innerHTML.match(/Modelo: <\/strong>(.*)/)[1];
-        const img = div.querySelector('img').src;
+        const marca = productos[idx].marca;
+        const modelo = productos[idx].modelo;
+        const img = productos[idx].imagesrc;
         const cantidad = div.querySelector('.cantidad').value || 1;
         seleccionados.push({ marca, modelo, img, cantidad });
       }
@@ -116,6 +124,5 @@
 
   cargarProductos();
 </script>
-
 </body>
 </html>
