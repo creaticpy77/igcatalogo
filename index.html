@@ -1,3 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>IG IMPORT - PRODUCTOS ANA HICKMANN</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa;}
+    h1 { margin-bottom: 10px; color: #b05eae; }
+    #buscar {margin-bottom: 15px; padding: 7px; width: 300px; font-size: 16px;}
+    #abrirSeleccionados {margin-bottom: 20px; padding: 10px 15px; background: #b05eae; color: #fff; border:none; border-radius: 4px; cursor:pointer;}
+    .producto { border: 1px solid #ddd; margin: 12px 0; padding: 15px; display:flex; align-items:center; background: #fff; border-radius: 8px;}
+    .producto img { max-width: 120px; margin-right: 20px; border-radius: 5px; border:1px solid #eee;}
+    .info { flex-grow: 1;}
+    .info strong {color: #6d28c2;}
+    input[type="number"] { width: 60px; font-size: 16px; }
+    .producto-select { margin-left: 18px; font-size: 15px;}
+    label { margin-bottom: 4px; }
+    @media (max-width:600px) {
+      .producto {flex-direction:column; align-items:flex-start;}
+      .producto img {margin-bottom: 10px;}
+    }
+  </style>
+</head>
+<body>
+  <h1>IG IMPORT - PRODUCTOS ANA HICKMANN</h1>
+  <input type="text" id="buscar" placeholder="Buscar por modelo..." oninput="filtrarProductos()" autocomplete="off" />
+  <br>
+  <button id="abrirSeleccionados" onclick="abrirSeleccionados()">Abrir Página con productos seleccionados</button>
+  <div id="productos"></div>
+
 <script>
 const HOJA_URL = "https://opensheet.elk.sh/1ik07i73RGHhsSCw71oz7-cwqt6g1gMfdjZ9sZDXhgP4/Hoja1";
 
@@ -87,5 +117,9 @@ fetch(HOJA_URL)
         document.getElementById('productos').innerHTML = '<p style="color:red">No se pudo cargar el catálogo.</p>';
         console.error(err);
     });
+
 </script>
+</body>
+</html>
+
 
